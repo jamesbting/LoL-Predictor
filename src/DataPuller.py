@@ -15,7 +15,14 @@ class AbstractDataPuller:
     def set_region(self,new_region):
         self.region = new_region
     def ApiErrorMessage(self,err):
-        pass
+        if err.response.status_code == 429:
+            print(f"We should retry in{err.headers['Retry-After']} seconds")
+            print("This retry-after is handled by default by the RiotWatcher library")
+            print("Future requests must wait until the retry-after time has passed")
+        elif err.response.status_code == 404:
+            print(f"No such information could not be found")
+        else:
+            raise
 
 class PlayerDataPuller(AbstractDataPuller):
     #concretesub class of abstract data puller,
@@ -27,50 +34,53 @@ class PlayerDataPuller(AbstractDataPuller):
         try:
             return self.lol_watcher.summoner.by_account(self.region,accountID)
         except ApiError as err:
-            ApiErrorMessage(err,accountID)
+            ApiErrorMessage(err)
 
-    def getPlayerInfoBySummonerID(self,summonerID):
+    def getPlayerInfoBySummonerID(self):
         try:
             return self.lol_watcher.summoner.by_account(self.region,summonerID)
         except ApiError as err:
-            ApiErrorMessage(err,summonerID)
+            ApiErrorMessage(err)
 
     def getPlayerInfoBySummonerName(self,summonerName):
         try:
             return self.lol_watcher.summoner.by_name(self.region,summonerName)
         except ApiError as err:
-            ApiErrorMessage(err,summonerName)
+            ApiErrorMessage(err)
 
     def getPlayerInfoByPlayerID(self,playerID):
         try:
             return self.lol_watcher.summoner.by_puuid(self.region,playerID)
             self.lol_watcher.summoner.by_id
         except ApiError as err:
-            ApiErrorMessage(err,playerID)
+            ApiErrorMessage(err)
 
-    def ApiErrorMessage(self,err,summonerInfo):
-        if err.response.status_code == 429:
-            print(f"We should retry in{err.headers['Retry-After']} seconds")
-            print("This retry-after is handled by default by the RiotWatcher library")
-            print("Future requests must wait until the retry-after time has passed")
-        elif err.response.status_code == 404:
-            print(f"Summoner with the summoner name/ID: {summonerInfo} could not be found")
-        else:
-            raise
+    def ApiErrorMessage(self,err):
+        super().ApiErrorMessage(err)
+        print("This error was raised by PlayerDataPuller")
+
 
 
 class MatchDataPuller(AbstractDataPuller):
     #concrete game puller class that pulls data for matches
     def __init__(self,api_key,region):
         super().__init__(api_key,region)
-    def ApiErrorMessage(self, err,matchID):
-        if err.response.status_code == 429:
-            print(f"We should retry in{err.headers['Retry-After']} seconds")
-            print("This retry-after is handled by default by the RiotWatcher library")
-            print("Future requests must wait until the retry-after time has passed")
-        elif err.response.status_code == 404:
-            print(f"Match with the match ID: {matchID} could not be found")
-        else:
-            raise
+    def getMatchInfoByMatchID(self,matchID: int):
+        try:
+            return self.lol_watcher.match.by_id(self.region,matchID)
+        except ApiError as err:
+            ApiErrorMessage(err)
+    
+    def getMatchListByAccountID(self,accountID):
+        try:
+            return self.lol_watcher.match.matchlist_by_account(self.region,accountID)
+        except ApiError as err:
+            ApiErrorMessage(err)
+
+    def ApiErrorMessage(self,err):
+        super().ApiErrorMessage(err)
+        print("This error was raised by MatchDataPuller")
+
+        
 
     

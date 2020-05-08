@@ -1,9 +1,31 @@
-from DataPuller import PlayerDataPuller
-#file to test other piles
-if __name__ == "__main__":
-    api_key = 'RGAPI-3117808d-74db-4bbc-959b-c966789344a6'
+from DataPuller import PlayerDataPuller, MatchDataPuller
+#file to test other files
+class DataPullerTester:
+    api_key_location = "api_key.txt"
+    f = open(api_key_location)
+    api_key = f.readline()
+    f.close()
     region = 'na1'
-    puller = PlayerDataPuller(api_key,region)
-    player_data = puller.getPlayerInfoByName("TheRipsticker")
-    print(player_data)
-    puller.set_region("EUW")
+    summonerName = "TheRipsticker" #test pulling my own data
+    
+    @staticmethod
+    def testPlayerDataPuller():
+        puller = PlayerDataPuller(DataPullerTester.api_key,DataPullerTester.region)
+        player_data = puller.getPlayerInfoBySummonerName(DataPullerTester.summonerName)
+        #print(player_data)
+        print(player_data['id'])
+    
+    @staticmethod
+    def testMatchDataPuller():
+        player_puller = PlayerDataPuller(DataPullerTester.api_key,DataPullerTester.region)
+        match_puller = MatchDataPuller(DataPullerTester.api_key,DataPullerTester.region)
+        player_data = player_puller.getPlayerInfoBySummonerName(DataPullerTester.summonerName)
+        match_timeline_data = match_puller.getMatchListByAccountID(player_data['id'])
+        print(match_timeline_data)
+
+
+
+
+if __name__ == "__main__":
+    DataPullerTester.testPlayerDataPuller()
+    DataPullerTester.testMatchDataPuller()
