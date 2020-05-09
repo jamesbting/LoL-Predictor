@@ -12,15 +12,14 @@ class DataPullerTester:
     def testPlayerDataPuller():
         puller = PlayerDataPuller(DataPullerTester.api_key,DataPullerTester.region)
         player_data = puller.getPlayerInfoBySummonerName(DataPullerTester.summonerName)
-        #print(player_data)
-        print(player_data['id'])
-    
+        print(player_data)
+
     @staticmethod
     def testMatchDataPuller():
         player_puller = PlayerDataPuller(DataPullerTester.api_key,DataPullerTester.region)
         match_puller = MatchDataPuller(DataPullerTester.api_key,DataPullerTester.region)
         player_data = player_puller.getPlayerInfoBySummonerName(DataPullerTester.summonerName)
-        match_timeline_data = match_puller.getMatchListByAccountID(player_data['id'])
+        match_timeline_data = match_puller.getMatchListByAccountID(player_data['accountId'])
         print(match_timeline_data)
 
 

@@ -7,5 +7,5 @@ This project is based on the projects done by Ken Hall(https://github.com/miniha
 
 The RiotWatcher wrapper for the Riot API is provided here: (https://github.com/pseudonym117/Riot-Watcher).
 
-Finally, thanks to the Riot Team for their API, which provided the data for this project.
+Thanks to Fernando Rubio Garcia for the data set. The data set comes from this Kaggle post: https://www.kaggle.com/fernandorubiogarcia/league-of-legends-data-patch-108/tasks?taskId=848
 

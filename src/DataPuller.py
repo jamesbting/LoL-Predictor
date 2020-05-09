@@ -36,7 +36,7 @@ class PlayerDataPuller(AbstractDataPuller):
         except ApiError as err:
             ApiErrorMessage(err)
 
-    def getPlayerInfoBySummonerID(self):
+    def getPlayerInfoBySummonerID(self,summonerID):
         try:
             return self.lol_watcher.summoner.by_account(self.region,summonerID)
         except ApiError as err:

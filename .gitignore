@@ -9,3 +9,4 @@
 .history/
 **/__pycache__
 **/api_key.txt
+**/not_my_datasets
