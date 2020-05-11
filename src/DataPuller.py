@@ -57,7 +57,7 @@ class PlayerDataPuller(AbstractDataPuller):
 
     def ApiErrorMessage(self,err):
         super().ApiErrorMessage(err)
-        print("This error was raised by PlayerDataPuller")
+        print("This error was raised by ",type(self).__name__)
 
 
 
@@ -79,8 +79,26 @@ class MatchDataPuller(AbstractDataPuller):
 
     def ApiErrorMessage(self,err):
         super().ApiErrorMessage(err)
-        print("This error was raised by MatchDataPuller")
+        print("This error was raised by ",type(self).__name__)
 
-        
+class ChampionMasteryDataPuller(AbstractDataPuller):
+    def __init__(self,api_key,region):
+        super().__init__(api_key,region)
+
+    def getChampionMastery(self,playerID,championID):
+        try:
+            return self.lol_watcher.champion_mastery.by_summoner_by_champion(self.region,playerID,championID)
+        except ApiError as err:
+            ApiErrorMessage(err)
+    
+    def getTotalChampionMastery(self,playerID):
+        try:
+            return self.lol_watcher.champion_mastery.scores_by_summoner(self.region,playerID)
+        except ApiError as err:
+            ApiErrorMessage(err)
+
+    def ApiErrorMessage(self,err):
+        super().ApiErrorMessage(err)
+        print("This error was raised by ",type(self).__name__)
 
     
