@@ -105,16 +105,18 @@ class DataSetMaker:
                 team_stats.append(match_data['teams'][teamIndex][team_stat])
         return team_stats
     
-    #method that adds the summoner information to a list, then returns the list
+    #method that adds all the summoner information to a list, then returns the list
     def __getSummonerInformation(self, match_data):
         summonerInformation = []
         player_puller = PlayerDataPuller(self.api_key,self.region)
         champion_mastery_puller = ChampionMasteryDataPuller(self.api_key,self.region)
 
         for participantIdentitiesIndex in range(0,10):
+            #get summoner information
             participantInformation = self.__getParticipantInformation(match_data,participantIdentitiesIndex,player_puller,champion_mastery_puller)
             summonerInformation = summonerInformation + participantInformation
 
+            #get summoner stats
             participantStats = self.__getParticipantStats(match_data,participantIdentitiesIndex)
             summonerInformation = summonerInformation + participantStats
             
@@ -151,6 +153,7 @@ class DataSetMaker:
         spell1Id = match_data["participants"][index]["spell1Id"]
         spell2Id = match_data["participants"][index]["spell2Id"]
 
+        #add participant Information to list
         participantInformation.append(championId)
         participantInformation.append(spell1Id)
         participantInformation.append(spell2Id)
@@ -159,15 +162,19 @@ class DataSetMaker:
         
     #get champion mastery information
     def __getParticipantChampionMastery(self,match_data,index,champion_mastery_puller):
-        participant_mastery_information = []
+        participant_mastery_information = [] # return value
+
+        #get necessary IDs
         summonerId = match_data["participantIdentities"][index]["player"]["summonerId"]
         championId = match_data["participants"][index]["championId"]
 
+        #get mastery information and add to list
         champion_mastery_information = champion_mastery_puller.getChampionMastery(summonerId,championId)
         for mastery_information in DataSetMaker.summoner_mastery:
             if(mastery_information != 'totalChampionMastery'):
                 participant_mastery_information.append(champion_mastery_information[mastery_information])
         
+        #add total mastery information to list
         total_mastery = champion_mastery_puller.getTotalChampionMastery(summonerId)
         participant_mastery_information.append(total_mastery)
         
