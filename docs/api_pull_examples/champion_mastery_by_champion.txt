@@ -1,0 +1,11 @@
+{
+    "championId": 21,
+    "championLevel": 5,
+    "championPoints": 64612,
+    "lastPlayTime": 1586754233000,
+    "championPointsSinceLastLevel": 43012,
+    "championPointsUntilNextLevel": 0,
+    "chestGranted": true,
+    "tokensEarned": 0,
+    "summonerId": "3Z5W7ttvkDCYp-Yz2VSY_-_AYKFUjvYNlkgIZcxMxnMxQHA"
+}

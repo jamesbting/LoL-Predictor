@@ -60,7 +60,6 @@ class PlayerDataPuller(AbstractDataPuller):
         print("This error was raised by ",type(self).__name__)
 
 
-
 class MatchDataPuller(AbstractDataPuller):
     #concrete game puller class that pulls data for matches
     def __init__(self,api_key,region):
@@ -85,15 +84,15 @@ class ChampionMasteryDataPuller(AbstractDataPuller):
     def __init__(self,api_key,region):
         super().__init__(api_key,region)
 
-    def getChampionMastery(self,playerID,championID):
+    def getChampionMastery(self,summonerID,championID):
         try:
-            return self.lol_watcher.champion_mastery.by_summoner_by_champion(self.region,playerID,championID)
+            return self.lol_watcher.champion_mastery.by_summoner_by_champion(self.region,summonerID,championID)
         except ApiError as err:
             ApiErrorMessage(err)
     
-    def getTotalChampionMastery(self,playerID):
+    def getTotalChampionMastery(self,summonerID):
         try:
-            return self.lol_watcher.champion_mastery.scores_by_summoner(self.region,playerID)
+            return self.lol_watcher.champion_mastery.scores_by_summoner(self.region,summonerID)
         except ApiError as err:
             ApiErrorMessage(err)
 

@@ -1,0 +1,7 @@
+{"id":"3Z5W7ttvkDCYp-Yz2VSY_-_AYKFUjvYNlkgIZcxMxnMxQHA",
+"accountId":"hvixZtCw_yooOyORj70hB8-i5zFUjy-B-VV0oz7Eif_3BnM",
+"puuid":"ETESYJ4mubRLbfHy9Q_oRGvgGO3CAgC29_KOdy25oU0Z08N8gWAH_2ouYPQcwC3FZGidaKTO-188NA",
+"name":"TheRipsticker",
+"profileIconId":1381,
+"revisionDate":1586756955000,
+"summonerLevel":64}
