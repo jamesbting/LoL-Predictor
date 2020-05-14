@@ -126,7 +126,7 @@ class DataSetMaker:
         
         #add victory data
         blue_team_win = match_data["teams"][0]["win"]
-        if(blue_team_win):
+        if(blue_team_win == "Win"):
             new_line.append(1)
             new_line.append(0)
         else: 
@@ -234,7 +234,7 @@ class DataSetMaker:
         participantStats = []
         for stat in DataSetMaker.participant_stats:
             if(stat == 'firstTowerKill' or stat == 'firstTowerAssist'):
-                if(self.firstTower):
+                if(self.firstTower == True):
                     participantStats.append(match_data["participants"][index]["stats"][stat])
                 else:
                     #no one got first tower, so add false for firstTower kill and assist to all participants
@@ -253,8 +253,8 @@ def main():
     api_key = f.readline()
     f.close()
     training_data_location = "C:\\Users\\James Ting\\OneDrive - McGill University\\Personal\\Personal Projects\\LoL-Predictor\\datasets\\training_data.csv"
-    starting_summ_name = "HelloMyHostages"
-    num_data_points = 5
+    starting_summ_name = "iAznProdigy" #Seed Summoner
+    num_data_points = 20
     data_set_maker = DataSetMaker(api_key_location,region,training_data_location,starting_summ_name,num_data_points=num_data_points)
     data_set_maker.makeTrainingData()
 
