@@ -1,5 +1,7 @@
 from DataPuller import PlayerDataPuller, MatchDataPuller,ChampionMasteryDataPuller
 import csv
+from SummonerCrawler import SummonerCrawler
+from tqdm import tqdm
 class DataSetMaker:
     #match id, then team stats then individual summoner stats(blue team, then red team), lastly which team won
     columns = ['gameId']
@@ -26,13 +28,15 @@ class DataSetMaker:
 
    
    
-    def __init__(self,api_key_location,region,training_data_location):
+    def __init__(self,api_key_location,region,training_data_location,starting_summoner_name,num_data_points = 10000):
         self.api_key_location = api_key_location
         f = open(self.api_key_location)
         self.api_key = f.readline()
         f.close()
         self.region = 'na1'
         self.training_data_location = training_data_location
+        self.starting_summoner_name = starting_summoner_name
+        self.num_data_points = num_data_points
 
         #the columns are intialized like this to prevent needing to write out each column manually
         for team in DataSetMaker.teams:
@@ -62,15 +66,44 @@ class DataSetMaker:
         
     #function that will make all the rows of the training data
     def makeTrainingData(self):
-        player_puller = PlayerDataPuller(self.api_key,self.region)
         match_puller = MatchDataPuller(self.api_key,self.region)
-        champion_puller = ChampionMasteryDataPuller(self.api_key,self.region)
-        f = open(training_data_location)
+        crawler = SummonerCrawler(self.api_key,self.region,self.starting_summoner_name,self.num_data_points)
+        counter = 3
+        summoner_name = self.starting_summoner_name
+        #pbar = tqdm(total = num_data_points)
+        pbar = tqdm(total = counter)
+        past_matches = set()
+        while(crawler.hasNext() and counter > 0):
+            match_data_list = crawler.getMatchData(summoner_name)
+            
+            if match_data_list:
+                for i in range(len(match_data_list)):
+                    matchId = match_data_list["matches"][i]["gameId"]
+                    if(matchId not in past_matches):
+                        self.writeMatchToFile(matchId,match_puller,self.training_data_location)
+                        past_matches.add(matchId)
+                        break
+            
+            summoner_name = crawler.next()
+            pbar.update(1)
+            counter -= 1
+        pbar.close()
         
-        f.close()
+        
+
+
     
     #function that will write a single match to a file
-    def writeMatchToFile(self,matchID,match_puller,file):
+    def writeMatchToFile(self,matchID,match_puller,filename):
+        newLine = self.__newMatchLine(matchID,match_puller)
+        with open(filename,'a',newline = '\n') as f:
+                writer = csv.writer(f)
+                writer.writerow(newLine)
+        f.close()
+
+        
+
+    def __newMatchLine(self,matchID,match_puller):
         match_data = match_puller.getMatchInfoByMatchID(matchID)
         if match_data['gameMode'] !="CLASSIC" or match_data['mapId'] != 11:
             return
@@ -94,9 +127,8 @@ class DataSetMaker:
         else: 
             new_line.append(0)
             new_line.append(1)
-
-        print(len(new_line))
-
+        
+        return new_line
     #method that adds the team stats for both teams to a list, then returns the list
     def __getTeamStats(self,match_data):
         team_stats = []
@@ -188,16 +220,16 @@ class DataSetMaker:
 
         return participantStats
 
-        
+#driver code to test functionality        
 def main():
     region = 'na1'
     f = open("api_key.txt","r")
     api_key = f.readline()
     f.close()
-    match_puller = MatchDataPuller(api_key,region)
-    data_set_maker = DataSetMaker("api_key.txt",region,None)
-    data_set_maker.writeMatchToFile(3073903129,match_puller,None)
-    print(len(DataSetMaker.columns))
+    training_data_location = "C:\\Users\\James Ting\\OneDrive - McGill University\\Personal\\Personal Projects\\LoL-Predictor\\datasets\\training_data.csv"
+    starting_summ_name = "MisterBentley"
+    data_set_maker = DataSetMaker("api_key.txt",region,training_data_location,starting_summ_name)
+    data_set_maker.makeTrainingData()
 
 main()
 
