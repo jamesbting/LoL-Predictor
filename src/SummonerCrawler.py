@@ -20,6 +20,8 @@ class SummonerCrawler(AbstractDataPuller):
         curr_player_matches = self.getMatchData(self.curr_summoner_name)
 
         #check each match
+        if curr_player_matches is None:
+
         for match in curr_player_matches["matches"]:
             match_id = match['gameId']
             match_data = self.match_puller.getMatchInfoByMatchID(match_id)
@@ -42,5 +44,9 @@ class SummonerCrawler(AbstractDataPuller):
 
     def getMatchData(self,summonerName):
         curr_player = self.player_puller.getPlayerInfoBySummonerName(self.curr_summoner_name)
-        return self.match_puller.getMatchListByAccountID(curr_player['accountId'],[420],[13]) #ranked queue only, for the 2019 season
-
+        match_data = self.match_puller.getMatchListByAccountID(curr_player['accountId'],[420],[13]) #ranked queue only, for the 2019 season
+        if match_data is None:
+            sleep(60)
+            self.getMatchData(summonerName)
+        else:
+            return match_data
