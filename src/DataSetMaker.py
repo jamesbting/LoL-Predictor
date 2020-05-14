@@ -37,6 +37,11 @@ class DataSetMaker:
         self.training_data_location = training_data_location
         self.starting_summoner_name = starting_summoner_name
         self.num_data_points = num_data_points
+        #add all the match Id's to the set that are in the training data file already
+        self.added_matches = set()
+        with open(self.training_data_location,"r") as f:
+            for row in f:
+                self.added_matches.add(row[0])
 
         #the columns are intialized like this to prevent needing to write out each column manually
         for team in DataSetMaker.teams:
@@ -72,7 +77,6 @@ class DataSetMaker:
         summoner_name = self.starting_summoner_name
         #pbar = tqdm(total = num_data_points)
         pbar = tqdm(total = counter)
-        past_matches = set()
         while(crawler.hasNext() and counter > 0):
             match_data_list = crawler.getMatchData(summoner_name)
             
@@ -81,7 +85,7 @@ class DataSetMaker:
                     matchId = match_data_list["matches"][i]["gameId"]
                     if(matchId not in past_matches):
                         self.writeMatchToFile(matchId,match_puller,self.training_data_location)
-                        past_matches.add(matchId)
+                        self.added_matches.add(matchId)
                         break
             
             summoner_name = crawler.next()
@@ -223,12 +227,13 @@ class DataSetMaker:
 #driver code to test functionality        
 def main():
     region = 'na1'
-    f = open("api_key.txt","r")
+    api_key_location = "api_key.txt"
+    f = open(api_key_location,"r")
     api_key = f.readline()
     f.close()
     training_data_location = "C:\\Users\\James Ting\\OneDrive - McGill University\\Personal\\Personal Projects\\LoL-Predictor\\datasets\\training_data.csv"
     starting_summ_name = "MisterBentley"
-    data_set_maker = DataSetMaker("api_key.txt",region,training_data_location,starting_summ_name)
+    data_set_maker = DataSetMaker(api_key_location,region,training_data_location,starting_summ_name)
     data_set_maker.makeTrainingData()
 
 main()
