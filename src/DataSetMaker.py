@@ -39,11 +39,12 @@ class DataSetMaker:
         self.num_data_points = num_data_points
         #add all the match Id's to the set that are in the training data file already
         self.added_matches = set()
+
         with open(self.training_data_location,"r") as f:
             for row in f:
                 self.added_matches.add(row[0])
 
-        #the columns are intialized like this to prevent needing to write out each column manually
+        #the columns are initialized like this to prevent needing to write out each column manually
         for team in DataSetMaker.teams:
             for team_stat in DataSetMaker.team_stats:
                 DataSetMaker.columns.append(team + team_stat)
@@ -67,7 +68,7 @@ class DataSetMaker:
         DataSetMaker.columns.append('b_win')
         DataSetMaker.columns.append('r_win')   
 
-             
+        self.firstTower = False #since the riot API skips the firstTowerKill and firstTowerAssist for participant stats if no tower is destroyed
         
     #function that will make all the rows of the training data
     def makeTrainingData(self):
@@ -82,9 +83,9 @@ class DataSetMaker:
                 for i in range(len(match_data_list)):
                     matchId = match_data_list["matches"][i]["gameId"]
                     if(matchId not in self.added_matches):
-                        self.writeMatchToFile(matchId,match_puller,self.training_data_location)
-                        self.added_matches.add(matchId)
-                        break
+                            self.writeMatchToFile(matchId,match_puller,self.training_data_location)
+                            self.added_matches.add(matchId)
+                            break
             
             summoner_name = crawler.next()
             pbar.update(1)
@@ -106,19 +107,22 @@ class DataSetMaker:
 
     def __newMatchLine(self,matchID,match_puller):
         match_data = match_puller.getMatchInfoByMatchID(matchID)
-        if match_data['gameMode'] !="CLASSIC" or match_data['mapId'] != 11:
+        if match_data['gameMode'] !="CLASSIC" or match_data['mapId'] != 11: #only get classic game mode from Summoner's Rift
             return
 
         new_line = []
-        #with open(file, newline='') as csvfile:
-            #writer = csv.writer(csvfile, delimiter=',', quotechar='"')
-            #for set_of_team_stats in [blue_team_stats, red_team_stats]:
         new_line.append(match_data['gameId'])
                
         #add team stats to the row
-        new_line = new_line + self.__getTeamStats(match_data)
+        team_stats = self.__getTeamStats(match_data)
+        #if(team_stats is None):
+           # return
+        new_line = new_line + team_stats
 
-        new_line = new_line + self.__getSummonerInformation(match_data)
+        summoner_information = self.__getSummonerInformation(match_data)
+        #if(summoner_information is None):
+          #  return
+        new_line = new_line + summoner_information
         
         #add victory data
         blue_team_win = match_data["teams"][0]["win"]
@@ -128,14 +132,21 @@ class DataSetMaker:
         else: 
             new_line.append(0)
             new_line.append(1)
-        
+
+        #if(len(new_line) != len(self.columns)):
+           #return
         return new_line
     #method that adds the team stats for both teams to a list, then returns the list
     def __getTeamStats(self,match_data):
         team_stats = []
+        first_tower = [False,False]
         for teamIndex in [0,1]:
             for team_stat in DataSetMaker.team_stats:
                 team_stats.append(match_data['teams'][teamIndex][team_stat])
+                if(team_stat == "firstTower"):
+                    first_tower[teamIndex] = match_data['teams'][teamIndex][team_stat]
+
+        self.firstTower = first_tower[0] or first_tower[1]
         return team_stats
     
     #method that adds all the summoner information to a list, then returns the list
@@ -147,6 +158,7 @@ class DataSetMaker:
         for participantIdentitiesIndex in range(0,10):
             #get summoner information
             participantInformation = self.__getParticipantInformation(match_data,participantIdentitiesIndex,player_puller,champion_mastery_puller)
+            
             summonerInformation = summonerInformation + participantInformation
 
             #get summoner stats
@@ -167,7 +179,10 @@ class DataSetMaker:
         accountId = match_data["participantIdentities"][index]["player"]["accountId"]
         
         #get summoner level based on account id
-        player_data = player_puller.getPlayerInfoByAccountID(accountID=accountId)
+        player_data = player_puller.getPlayerInfoByAccountID(accountId)
+        #if(player_data == None):
+           # return
+        
         summonerLevel = player_data["summonerLevel"]
 
         role =  match_data["participants"][index]["timeline"]["role"]
@@ -214,10 +229,19 @@ class DataSetMaker:
         return participant_mastery_information
     
     #get the stats for a participant for this game
+    #check the first tower adding to stat list problem
     def __getParticipantStats(self,match_data,index):
         participantStats = []
         for stat in DataSetMaker.participant_stats:
-            participantStats.append(match_data["participants"][index]["stats"][stat])
+            if(stat == 'firstTowerKill' or stat == 'firstTowerAssist'):
+                if(self.firstTower):
+                    participantStats.append(match_data["participants"][index]["stats"][stat])
+                else:
+                    #no one got first tower, so add false for firstTower kill and assist to all participants
+                    participantStats.append("False")
+            else:
+                 participantStats.append(match_data["participants"][index]["stats"][stat])
+
 
         return participantStats
 
@@ -229,8 +253,8 @@ def main():
     api_key = f.readline()
     f.close()
     training_data_location = "C:\\Users\\James Ting\\OneDrive - McGill University\\Personal\\Personal Projects\\LoL-Predictor\\datasets\\training_data.csv"
-    starting_summ_name = "MisterBentley"
-    num_data_points = 1000
+    starting_summ_name = "HelloMyHostages"
+    num_data_points = 5
     data_set_maker = DataSetMaker(api_key_location,region,training_data_location,starting_summ_name,num_data_points=num_data_points)
     data_set_maker.makeTrainingData()
 

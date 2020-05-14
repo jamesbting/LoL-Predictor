@@ -19,9 +19,13 @@ class AbstractDataPuller:
             print("We should retry in {seconds} seconds".format(seconds = err.headers['Retry-After']))
             print("This retry-after is handled by default by the RiotWatcher library")
             print("Future requests must wait until the retry-after time has passed")
+            return
         elif err.response.status_code == 404:
             print("No such information could not be found")
-        else:
+            return
+        elif err.response.status_code == 504:
+            print("Gateway Error")
+            return
             raise
 
 class PlayerDataPuller(AbstractDataPuller):
@@ -34,26 +38,26 @@ class PlayerDataPuller(AbstractDataPuller):
         try:
             return self.lol_watcher.summoner.by_account(self.region,accountID)
         except ApiError as err:
-            self.ApiErrorMessage(err)
+            return self.ApiErrorMessage(err)
 
     def getPlayerInfoBySummonerID(self,summonerID):
         try:
             return self.lol_watcher.summoner.by_account(self.region,summonerID)
         except ApiError as err:
-            self.ApiErrorMessage(err)
+            return self.ApiErrorMessage(err)
 
     def getPlayerInfoBySummonerName(self,summonerName):
         try:
             return self.lol_watcher.summoner.by_name(self.region,summonerName)
         except ApiError as err:
-            self.ApiErrorMessage(err)
+            return self.ApiErrorMessage(err)
 
     def getPlayerInfoByPlayerID(self,playerID):
         try:
             return self.lol_watcher.summoner.by_puuid(self.region,playerID)
             self.lol_watcher.summoner.by_id
         except ApiError as err:
-            self.ApiErrorMessage(err)
+            return self.ApiErrorMessage(err)
 
     def ApiErrorMessage(self,err):
         super().ApiErrorMessage(err)
@@ -68,13 +72,13 @@ class MatchDataPuller(AbstractDataPuller):
         try:
             return self.lol_watcher.match.by_id(self.region,matchID)
         except ApiError as err:
-            self.ApiErrorMessage(err)
+            return self.ApiErrorMessage(err)
     
     def getMatchListByAccountID(self,accountID,queue = None,season = None):
         try:
             return self.lol_watcher.match.matchlist_by_account(self.region,accountID,queue,season)
         except ApiError as err:
-            self.ApiErrorMessage(err)
+            return self.ApiErrorMessage(err)
 
     def ApiErrorMessage(self,err):
         super().ApiErrorMessage(err)
@@ -88,13 +92,13 @@ class ChampionMasteryDataPuller(AbstractDataPuller):
         try:
             return self.lol_watcher.champion_mastery.by_summoner_by_champion(self.region,summonerID,championID)
         except ApiError as err:
-            self.ApiErrorMessage(err)
+            return self.ApiErrorMessage(err)
     
     def getTotalChampionMastery(self,summonerID):
         try:
             return self.lol_watcher.champion_mastery.scores_by_summoner(self.region,summonerID)
         except ApiError as err:
-            self.ApiErrorMessage(err)
+            return self.ApiErrorMessage(err)
 
     def ApiErrorMessage(self,err):
         super().ApiErrorMessage(err)
