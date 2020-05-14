@@ -16,11 +16,11 @@ class AbstractDataPuller:
         self.region = new_region
     def ApiErrorMessage(self,err):
         if err.response.status_code == 429:
-            print(f"We should retry in{err.headers['Retry-After']} seconds")
+            print("We should retry in {seconds} seconds".format(seconds = err.headers['Retry-After']))
             print("This retry-after is handled by default by the RiotWatcher library")
             print("Future requests must wait until the retry-after time has passed")
         elif err.response.status_code == 404:
-            print(f"No such information could not be found")
+            print("No such information could not be found")
         else:
             raise
 
@@ -64,7 +64,7 @@ class MatchDataPuller(AbstractDataPuller):
     #concrete game puller class that pulls data for matches
     def __init__(self,api_key,region):
         super().__init__(api_key,region)
-    def getMatchInfoByMatchID(self,matchID: int):
+    def getMatchInfoByMatchID(self,matchID):
         try:
             return self.lol_watcher.match.by_id(self.region,matchID)
         except ApiError as err:

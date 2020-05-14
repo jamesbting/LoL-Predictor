@@ -73,24 +73,21 @@ class DataSetMaker:
     def makeTrainingData(self):
         match_puller = MatchDataPuller(self.api_key,self.region)
         crawler = SummonerCrawler(self.api_key,self.region,self.starting_summoner_name,self.num_data_points)
-        counter = 3
         summoner_name = self.starting_summoner_name
-        #pbar = tqdm(total = num_data_points)
-        pbar = tqdm(total = counter)
-        while(crawler.hasNext() and counter > 0):
+        pbar = tqdm(total = self.num_data_points)
+        while(crawler.hasNext()):
             match_data_list = crawler.getMatchData(summoner_name)
             
             if match_data_list:
                 for i in range(len(match_data_list)):
                     matchId = match_data_list["matches"][i]["gameId"]
-                    if(matchId not in past_matches):
+                    if(matchId not in self.added_matches):
                         self.writeMatchToFile(matchId,match_puller,self.training_data_location)
                         self.added_matches.add(matchId)
                         break
             
             summoner_name = crawler.next()
             pbar.update(1)
-            counter -= 1
         pbar.close()
         
         
@@ -233,7 +230,8 @@ def main():
     f.close()
     training_data_location = "C:\\Users\\James Ting\\OneDrive - McGill University\\Personal\\Personal Projects\\LoL-Predictor\\datasets\\training_data.csv"
     starting_summ_name = "MisterBentley"
-    data_set_maker = DataSetMaker(api_key_location,region,training_data_location,starting_summ_name)
+    num_data_points = 1000
+    data_set_maker = DataSetMaker(api_key_location,region,training_data_location,starting_summ_name,num_data_points=num_data_points)
     data_set_maker.makeTrainingData()
 
 main()
