@@ -29,7 +29,7 @@ class AbstractDataPuller:
             raise
 
 class PlayerDataPuller(AbstractDataPuller):
-    #concretesub class of abstract data puller,
+    #concrete subclass of abstract data puller,
     #pulls player data with various methods, such as account ID, player ID, summoner name, and summoner ID
     def __init__(self,api_key,region):
         super().__init__(api_key,region)
