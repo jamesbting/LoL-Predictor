@@ -118,13 +118,9 @@ class DataSetMaker:
                
         #add team stats to the row
         team_stats = self.__getTeamStats(match_data)
-        #if(team_stats is None):
-           # return
         new_line = new_line + team_stats
 
         summoner_information = self.__getSummonerInformation(match_data)
-        #if(summoner_information is None):
-          #  return
         new_line = new_line + summoner_information
         
         #add victory data
@@ -136,8 +132,6 @@ class DataSetMaker:
             new_line.append(0)
             new_line.append(1)
 
-        #if(len(new_line) != len(self.columns)):
-           #return
         return new_line
     #method that adds the team stats for both teams to a list, then returns the list
     def __getTeamStats(self,match_data):
