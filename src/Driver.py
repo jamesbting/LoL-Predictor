@@ -1,43 +1,14 @@
-from DataPuller import PlayerDataPuller, MatchDataPuller,ChampionMasteryDataPuller
-#file to test other files
-class DataPullerTester:
+from DataSetMaker import DataSetMaker
+def main():
+    region = 'na1'
     api_key_location = "api_key.txt"
-    f = open(api_key_location)
+    f = open(api_key_location,"r")
     api_key = f.readline()
     f.close()
-    region = 'na1'
-    summonerName = "TheRipsticker" #test pulling my own data
-    championID = 21 #champion ID for Miss Fortune
-    
-    @staticmethod
-    def testPlayerDataPuller():
-        puller = PlayerDataPuller(DataPullerTester.api_key,DataPullerTester.region)
-        
-        player_data = puller.getPlayerInfoBySummonerName(DataPullerTester.summonerName)
-        print(player_data)
-        print(player_data['accountId'])
-
-    @staticmethod
-    def testMatchDataPuller():
-        player_puller = PlayerDataPuller(DataPullerTester.api_key,DataPullerTester.region)
-        match_puller = MatchDataPuller(DataPullerTester.api_key,DataPullerTester.region)
-        
-        player_data = player_puller.getPlayerInfoBySummonerName(DataPullerTester.summonerName)
-        match_timeline_data = match_puller.getMatchListByAccountID(player_data['accountId'])
-        print(match_timeline_data)
-
-    @staticmethod
-    def testChampionDataPuller():
-        player_puller = PlayerDataPuller(DataPullerTester.api_key,DataPullerTester.region)
-        champion_puller = ChampionMasteryDataPuller(DataPullerTester.api_key,DataPullerTester.region)
-        player_data = player_puller.getPlayerInfoBySummonerName(DataPullerTester.summonerName)
-        
-        total_champion_data = champion_puller.getTotalChampionMastery(player_data['id'])
-        print(total_champion_data)
-        champion_data_puller = champion_puller.getChampionMastery(player_data['id'],DataPullerTester.championID)
-        print(champion_data_puller)
-
+    training_data_location = "C:\\Users\\James Ting\\OneDrive - McGill University\\Personal\\Personal Projects\\LoL-Predictor\\datasets\\training_data.csv"
+    starting_summ_name = "Falconshot33" #Seed Summoner
+    num_data_points = 30
+    data_set_maker = DataSetMaker(api_key_location,region,training_data_location,starting_summ_name,num_data_points=num_data_points)
+    data_set_maker.makeTrainingData()
 if __name__ == "__main__":
-    DataPullerTester.testPlayerDataPuller()
-    DataPullerTester.testMatchDataPuller()
-    DataPullerTester.testChampionDataPuller()
+    main()

@@ -83,10 +83,13 @@ class DataSetMaker:
                 for i in range(len(match_data_list)):
                     matchId = match_data_list["matches"][i]["gameId"]
                     if(matchId not in self.added_matches):
-                            self.writeMatchToFile(matchId,match_puller,self.training_data_location)
-                            self.added_matches.add(matchId)
-                            break
-            
+                            try:
+                                self.writeMatchToFile(matchId,match_puller,self.training_data_location)
+                            except TypeError as err:
+                                continue
+                            else:
+                                self.added_matches.add(matchId)
+                                break
             summoner_name = crawler.next()
             pbar.update(1)
         pbar.close()
@@ -245,20 +248,6 @@ class DataSetMaker:
 
         return participantStats
 
-#driver code to test functionality        
-def main():
-    region = 'na1'
-    api_key_location = "api_key.txt"
-    f = open(api_key_location,"r")
-    api_key = f.readline()
-    f.close()
-    training_data_location = "C:\\Users\\James Ting\\OneDrive - McGill University\\Personal\\Personal Projects\\LoL-Predictor\\datasets\\training_data.csv"
-    starting_summ_name = "iAznProdigy" #Seed Summoner
-    num_data_points = 20
-    data_set_maker = DataSetMaker(api_key_location,region,training_data_location,starting_summ_name,num_data_points=num_data_points)
-    data_set_maker.makeTrainingData()
-
-main()
 
 
 
