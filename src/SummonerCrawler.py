@@ -23,6 +23,8 @@ class SummonerCrawler(AbstractDataPuller):
         for match in curr_player_matches["matches"]:
             match_id = match['gameId']
             match_data = self.match_puller.getMatchInfoByMatchID(match_id)
+            if match_data is None:
+                continue
             participants = match_data["participantIdentities"]
             
             #get info on the next summoner

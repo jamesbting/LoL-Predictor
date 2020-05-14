@@ -85,9 +85,8 @@ class DataSetMaker:
                     if(matchId not in self.added_matches):
                             try:
                                 self.writeMatchToFile(matchId,match_puller,self.training_data_location)
-                            except TypeError as err:
-                                continue
-                            except KeyError as err:
+                            except:
+                                #something went wrong, just skip this match
                                 continue
                             else:
                                 self.added_matches.add(matchId)

@@ -14,7 +14,7 @@ def main():
         training_data_location = "C:\\Users\\James Ting\\OneDrive - McGill University\\Personal\\Personal Projects\\LoL-Predictor\\datasets\\training_data.csv"
     
     
-    starting_summ_name = "resurrexion" #Seed Summoner
+    starting_summ_name = "Zanybar" #Seed Summoner
     
     num_data_points = 100
     data_set_maker = DataSetMaker(api_key_location,region,training_data_location,starting_summ_name,num_data_points=num_data_points)
