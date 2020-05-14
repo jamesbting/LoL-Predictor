@@ -34,26 +34,26 @@ class PlayerDataPuller(AbstractDataPuller):
         try:
             return self.lol_watcher.summoner.by_account(self.region,accountID)
         except ApiError as err:
-            ApiErrorMessage(err)
+            self.ApiErrorMessage(err)
 
     def getPlayerInfoBySummonerID(self,summonerID):
         try:
             return self.lol_watcher.summoner.by_account(self.region,summonerID)
         except ApiError as err:
-            ApiErrorMessage(err)
+            self.ApiErrorMessage(err)
 
     def getPlayerInfoBySummonerName(self,summonerName):
         try:
             return self.lol_watcher.summoner.by_name(self.region,summonerName)
         except ApiError as err:
-            ApiErrorMessage(err)
+            self.ApiErrorMessage(err)
 
     def getPlayerInfoByPlayerID(self,playerID):
         try:
             return self.lol_watcher.summoner.by_puuid(self.region,playerID)
             self.lol_watcher.summoner.by_id
         except ApiError as err:
-            ApiErrorMessage(err)
+            self.ApiErrorMessage(err)
 
     def ApiErrorMessage(self,err):
         super().ApiErrorMessage(err)
@@ -68,13 +68,13 @@ class MatchDataPuller(AbstractDataPuller):
         try:
             return self.lol_watcher.match.by_id(self.region,matchID)
         except ApiError as err:
-            ApiErrorMessage(err)
+            self.ApiErrorMessage(err)
     
-    def getMatchListByAccountID(self,accountID):
+    def getMatchListByAccountID(self,accountID,queue = None,season = None):
         try:
-            return self.lol_watcher.match.matchlist_by_account(self.region,accountID)
+            return self.lol_watcher.match.matchlist_by_account(self.region,accountID,queue,season)
         except ApiError as err:
-            ApiErrorMessage(err)
+            self.ApiErrorMessage(err)
 
     def ApiErrorMessage(self,err):
         super().ApiErrorMessage(err)
@@ -88,13 +88,13 @@ class ChampionMasteryDataPuller(AbstractDataPuller):
         try:
             return self.lol_watcher.champion_mastery.by_summoner_by_champion(self.region,summonerID,championID)
         except ApiError as err:
-            ApiErrorMessage(err)
+            self.ApiErrorMessage(err)
     
     def getTotalChampionMastery(self,summonerID):
         try:
             return self.lol_watcher.champion_mastery.scores_by_summoner(self.region,summonerID)
         except ApiError as err:
-            ApiErrorMessage(err)
+            self.ApiErrorMessage(err)
 
     def ApiErrorMessage(self,err):
         super().ApiErrorMessage(err)
