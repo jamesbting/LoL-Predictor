@@ -87,6 +87,8 @@ class DataSetMaker:
                                 self.writeMatchToFile(matchId,match_puller,self.training_data_location)
                             except TypeError as err:
                                 continue
+                            except KeyError as err:
+                                continue
                             else:
                                 self.added_matches.add(matchId)
                                 break
