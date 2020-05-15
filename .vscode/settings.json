@@ -1,11 +1,9 @@
 {
-    "python.pythonPath": "C:\\Users\\UserD\\AppData\\Local\\Programs\\Python\\Python36\\python.exe",
     "spellright.language": [
         "en"
     ],
     "spellright.documentTypes": [
         "markdown",
-        "latex",
-        "python"
+        "latex"
     ]
 }

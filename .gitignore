@@ -10,3 +10,5 @@
 **/__pycache__
 **/api_key.txt
 **/not_my_datasets
+**/.vscode
+**/src/__pycache__

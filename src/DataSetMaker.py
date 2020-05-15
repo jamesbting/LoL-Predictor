@@ -2,6 +2,7 @@ from DataPuller import PlayerDataPuller, MatchDataPuller,ChampionMasteryDataPull
 import csv
 from SummonerCrawler import SummonerCrawler
 from tqdm import tqdm
+import time
 class DataSetMaker:
     #match id, then team stats then individual summoner stats(blue team, then red team), lastly which team won
     columns = ['gameId']
@@ -28,17 +29,18 @@ class DataSetMaker:
 
    
    
-    def __init__(self,api_key_location,region,training_data_location,starting_summoner_name,num_data_points = 10000):
+    def __init__(self,api_key_location,region,training_data_location,starting_matchID,num_data_points = 10000):
         self.api_key_location = api_key_location
         f = open(self.api_key_location)
         self.api_key = f.readline()
         f.close()
         self.region = 'na1'
         self.training_data_location = training_data_location
-        self.starting_summoner_name = starting_summoner_name
+        self.starting_matchID = starting_matchID
         self.num_data_points = num_data_points
         #add all the match Id's to the set that are in the training data file already
         self.added_matches = set()
+        
 
         with open(self.training_data_location,"r") as f:
             for row in f:
@@ -73,32 +75,25 @@ class DataSetMaker:
     #function that will make all the rows of the training data
     def makeTrainingData(self):
         match_puller = MatchDataPuller(self.api_key,self.region)
-        crawler = SummonerCrawler(self.api_key,self.region,self.starting_summoner_name,self.num_data_points)
-        summoner_name = self.starting_summoner_name
+        crawler = SummonerCrawler(self.api_key,self.region,self.starting_matchID,self.num_data_points)
+        matchID = self.starting_matchID
         pbar = tqdm(total = self.num_data_points)
         while(crawler.hasNext()):
-            match_data_list = crawler.getMatchData(summoner_name)
-            
-            if match_data_list:
-                for i in range(len(match_data_list)):
-                    matchId = match_data_list["matches"][i]["gameId"]
-                    if(matchId not in self.added_matches):
-                            try:
-                                self.writeMatchToFile(matchId,match_puller,self.training_data_location)
-                            except:
-                                #something went wrong, just skip this match
-                                continue
-                            else:
-                                self.added_matches.add(matchId)
-                                break
-            summoner_name = crawler.next()
+            if(matchID not in self.added_matches):
+                try:
+                    self.writeMatchToFile(matchID,match_puller,self.training_data_location)
+                    self.added_matches.add(matchID)
+                except:
+                    #something went wrong, just skip this match
+                    matchID = crawler.next()
+                    pbar.update(1)
+                    continue
+            matchID = crawler.next()
             pbar.update(1)
+        
+        #done looping
         pbar.close()
         
-        
-
-
-    
     #function that will write a single match to a file
     def writeMatchToFile(self,matchID,match_puller,filename):
         newLine = self.__newMatchLine(matchID,match_puller)
@@ -106,6 +101,7 @@ class DataSetMaker:
                 writer = csv.writer(f)
                 writer.writerow(newLine)
         f.close()
+        self.added_matches.add(newLine[0])
 
         
 
@@ -140,9 +136,10 @@ class DataSetMaker:
         first_tower = [False,False]
         for teamIndex in [0,1]:
             for team_stat in DataSetMaker.team_stats:
-                team_stats.append(match_data['teams'][teamIndex][team_stat])
+                new_stat = match_data['teams'][teamIndex][team_stat]
+                team_stats.append(new_stat)
                 if(team_stat == "firstTower"):
-                    first_tower[teamIndex] = match_data['teams'][teamIndex][team_stat]
+                    first_tower[teamIndex] = new_stat
 
         self.firstTower = first_tower[0] or first_tower[1]
         return team_stats
@@ -178,8 +175,6 @@ class DataSetMaker:
         
         #get summoner level based on account id
         player_data = player_puller.getPlayerInfoByAccountID(accountId)
-        #if(player_data == None):
-           # return
         
         summonerLevel = player_data["summonerLevel"]
 
