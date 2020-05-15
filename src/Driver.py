@@ -16,7 +16,7 @@ def main():
     
     starting_summ_name = "B5Police" #Seed Summoner
     
-    num_data_points = 100
+    num_data_points = 50
     data_set_maker = DataSetMaker(api_key_location,region,training_data_location,starting_summ_name,num_data_points=num_data_points)
     data_set_maker.makeTrainingData()
 

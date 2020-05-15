@@ -1,4 +1,5 @@
 from riotwatcher import LolWatcher,ApiError
+import time
 
 class AbstractDataPuller:
     #abstract data puller class
@@ -19,13 +20,18 @@ class AbstractDataPuller:
             print("We should retry in {seconds} seconds".format(seconds = err.headers['Retry-After']))
             print("This retry-after is handled by default by the RiotWatcher library")
             print("Future requests must wait until the retry-after time has passed")
+            time.sleep(30)
             return
         elif err.response.status_code == 404:
             print("No such information could not be found")
             return
         elif err.response.status_code == 504:
-            print("Gateway Error")
+            time.sleep(30)
             return
+        elif err.response.status_code == 503:
+            time.sleep(30)
+            return
+        else:
             raise
 
 class PlayerDataPuller(AbstractDataPuller):
