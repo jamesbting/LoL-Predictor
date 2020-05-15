@@ -31,8 +31,6 @@ class AbstractDataPuller:
         elif err.response.status_code == 503:
             time.sleep(30)
             return
-        else:
-            raise
 
 class PlayerDataPuller(AbstractDataPuller):
     #concrete subclass of abstract data puller,
