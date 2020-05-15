@@ -14,13 +14,16 @@ def main():
     else:
         training_data_location = "C:\\Users\\James Ting\\OneDrive - McGill University\\Personal\\Personal Projects\\LoL-Predictor\\datasets\\training_data.csv"
     
-    list = []
+    mylist = []
+    training_data_location = "C:\\Users\\James Ting\\OneDrive - McGill University\\Personal\\Personal Projects\\LoL-Predictor\\datasets\\training_data.csv"
     with open(training_data_location,"r") as f:
-        list = reversed(list(csv.reader(f)))
+        for row in reversed(list(csv.reader(f))):
+            mylist = row
+            break
+
+    starting_matchID = mylist[0] #Seed matchID
     
-    starting_matchID = list[0][0] #Seed matchID
-    
-    num_data_points = 50
+    num_data_points = 750
 
     data_set_maker = DataSetMaker(api_key_location,region,training_data_location,starting_matchID,num_data_points=num_data_points)
     data_set_maker.makeTrainingData()
