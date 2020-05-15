@@ -82,12 +82,11 @@ class DataSetMaker:
             if(matchID not in self.added_matches):
                 try:
                     self.writeMatchToFile(matchID,match_puller,self.training_data_location)
-                    self.added_matches.add(matchID)
                 except:
                     #something went wrong, just skip this match
-                    matchID = crawler.next()
-                    pbar.update(1)
+                    matchID = crawler.next(worked = False)
                     continue
+
             matchID = crawler.next()
             pbar.update(1)
         
@@ -107,27 +106,23 @@ class DataSetMaker:
 
     def __newMatchLine(self,matchID,match_puller):
         match_data = match_puller.getMatchInfoByMatchID(matchID)
-        if match_data['gameMode'] !="CLASSIC" or match_data['mapId'] != 11: #only get classic game mode from Summoner's Rift
-            return
+        #if match_data['gameMode'] !="CLASSIC" or match_data['mapId'] != 11: #only get classic game mode from Summoner's Rift
+            #return
 
         new_line = []
         new_line.append(match_data['gameId'])
-               
         #add team stats to the row
-        team_stats = self.__getTeamStats(match_data)
-        new_line = new_line + team_stats
+        new_line.extend(self.__getTeamStats(match_data))
 
-        summoner_information = self.__getSummonerInformation(match_data)
-        new_line = new_line + summoner_information
+        #add summoner stats to the row
+        new_line.extend(self.__getSummonerInformation(match_data))
         
         #add victory data
         blue_team_win = match_data["teams"][0]["win"]
         if(blue_team_win == "Win"):
-            new_line.append(1)
-            new_line.append(0)
+            new_line.extend([1,0])
         else: 
-            new_line.append(0)
-            new_line.append(1)
+            new_line.extend([0,1])
 
         return new_line
     #method that adds the team stats for both teams to a list, then returns the list
@@ -136,10 +131,12 @@ class DataSetMaker:
         first_tower = [False,False]
         for teamIndex in [0,1]:
             for team_stat in DataSetMaker.team_stats:
-                new_stat = match_data['teams'][teamIndex][team_stat]
-                team_stats.append(new_stat)
                 if(team_stat == "firstTower"):
+                    new_stat = match_data['teams'][teamIndex][team_stat]
+                    team_stats.append(new_stat)
                     first_tower[teamIndex] = new_stat
+                else:
+                    team_stats.append(match_data['teams'][teamIndex][team_stat])
 
         self.firstTower = first_tower[0] or first_tower[1]
         return team_stats
@@ -152,13 +149,12 @@ class DataSetMaker:
 
         for participantIdentitiesIndex in range(0,10):
             #get summoner information
-            participantInformation = self.__getParticipantInformation(match_data,participantIdentitiesIndex,player_puller,champion_mastery_puller)
             
-            summonerInformation = summonerInformation + participantInformation
+            summonerInformation.extend(self.__getParticipantInformation(match_data,
+            participantIdentitiesIndex,player_puller,champion_mastery_puller))
 
             #get summoner stats
-            participantStats = self.__getParticipantStats(match_data,participantIdentitiesIndex)
-            summonerInformation = summonerInformation + participantStats
+            summonerInformation.extend(self.__getParticipantStats(match_data,participantIdentitiesIndex))
             
         return summonerInformation
 
@@ -176,28 +172,17 @@ class DataSetMaker:
         #get summoner level based on account id
         player_data = player_puller.getPlayerInfoByAccountID(accountId)
         
-        summonerLevel = player_data["summonerLevel"]
-
-        role =  match_data["participants"][index]["timeline"]["role"]
-        lane =  match_data["participants"][index]["timeline"]["lane"]
-        
         #append the data to the list
-        participantInformation.append(accountId)
-        participantInformation.append(summonerLevel)
-        participantInformation.append(role)
-        participantInformation.append(lane)
+        participantInformation.extend([accountId,player_data["summonerLevel"],match_data["participants"][index]["timeline"]["role"],
+                                       match_data["participants"][index]["timeline"]["lane"]])
 
         #get champion mastery information
-        participantInformation = participantInformation + self.__getParticipantChampionMastery(match_data,index,champion_mastery_puller)
+        participantInformation.extend(self.__getParticipantChampionMastery(match_data,index,champion_mastery_puller))
 
-        championId = match_data["participants"][index]["championId"]
-        spell1Id = match_data["participants"][index]["spell1Id"]
-        spell2Id = match_data["participants"][index]["spell2Id"]
-
+    
         #add participant Information to list
-        participantInformation.append(championId)
-        participantInformation.append(spell1Id)
-        participantInformation.append(spell2Id)
+        participantInformation.extend([match_data["participants"][index]["championId"],match_data["participants"][index]["spell1Id"],
+                                       match_data["participants"][index]["spell2Id"]])
 
         return participantInformation
         
@@ -211,8 +196,7 @@ class DataSetMaker:
 
         #get mastery information and add to list
         champion_mastery_information = champion_mastery_puller.getChampionMastery(summonerId,championId)
-        for mastery_information in DataSetMaker.summoner_mastery:
-            if(mastery_information != 'totalChampionMastery'):
+        for mastery_information in DataSetMaker.summoner_mastery[:-1]:
                 participant_mastery_information.append(champion_mastery_information[mastery_information])
         
         #add total mastery information to list
@@ -227,14 +211,13 @@ class DataSetMaker:
         participantStats = []
         for stat in DataSetMaker.participant_stats:
             if(stat == 'firstTowerKill' or stat == 'firstTowerAssist'):
-                if(self.firstTower == True):
+                if self.firstTower:
                     participantStats.append(match_data["participants"][index]["stats"][stat])
                 else:
                     #no one got first tower, so add false for firstTower kill and assist to all participants
                     participantStats.append("False")
             else:
                  participantStats.append(match_data["participants"][index]["stats"][stat])
-
 
         return participantStats
 

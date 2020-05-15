@@ -23,20 +23,10 @@ class SummonerCrawler(AbstractDataPuller):
     def hasNext(self):
         return self.num_iterations < self.max_iterations
 
-    def next(self):
+    def next(self,worked = True):
         assert self.hasNext()
         
-        #random_match_list = random.shuffle(self.curr_player_matches["matches"])
-        
-        #for match in random_match_list:
-        #    match_id = match['gameId']
-        #    match_data = self.match_puller.getMatchInfoByMatchID(match_id)
-
-        #    if match_data is None:
-        #        continue
-        #    participants = match_data["participantIdentities"]
-            
-        
+        #make sure we dont exceed the limit
         if(self.num_iterations != 0 and (self.num_calls * self.num_iterations) % 100 == 0):
             time.sleep(120)
 
@@ -45,8 +35,8 @@ class SummonerCrawler(AbstractDataPuller):
         self.current_matchID = random.choice(all_matches_list)["gameId"]
             
             
-        
-        self.num_iterations += 1
+        if worked:
+            self.num_iterations += 1
         return self.current_matchID
 
     def __getMatchData(self, matchID):
@@ -55,7 +45,6 @@ class SummonerCrawler(AbstractDataPuller):
     def getMatchList(self):
         curr_summoners = self.__getMatchData(self.current_matchID)["participantIdentities"]
         for summoner in curr_summoners:
-            
             curr_player = self.player_puller.getPlayerInfoBySummonerName(summoner["player"]["summonerName"])
             try:
                 match_data_list = self.getMatchListForParticipant(curr_player)

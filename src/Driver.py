@@ -14,8 +14,8 @@ def main():
     else:
         training_data_location = "C:\\Users\\James Ting\\OneDrive - McGill University\\Personal\\Personal Projects\\LoL-Predictor\\datasets\\training_data.csv"
     
+    #read the last line of the training data, and then set as seed matchID
     mylist = []
-    training_data_location = "C:\\Users\\James Ting\\OneDrive - McGill University\\Personal\\Personal Projects\\LoL-Predictor\\datasets\\training_data.csv"
     with open(training_data_location,"r") as f:
         for row in reversed(list(csv.reader(f))):
             mylist = row
@@ -23,7 +23,7 @@ def main():
 
     starting_matchID = mylist[0] #Seed matchID
     
-    num_data_points = 1000
+    num_data_points = 30
 
     data_set_maker = DataSetMaker(api_key_location,region,training_data_location,starting_matchID,num_data_points=num_data_points)
     data_set_maker.makeTrainingData()
