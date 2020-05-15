@@ -23,7 +23,7 @@ def main():
 
     starting_matchID = mylist[0] #Seed matchID
     
-    num_data_points = 750
+    num_data_points = 1000
 
     data_set_maker = DataSetMaker(api_key_location,region,training_data_location,starting_matchID,num_data_points=num_data_points)
     data_set_maker.makeTrainingData()
