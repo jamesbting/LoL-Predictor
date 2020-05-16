@@ -42,8 +42,10 @@ class DataSetMaker:
         
 
         with open(self.training_data_location,"r") as f:
-            for row in f:
-                self.added_matches.add(row[0])
+            reader = csv.reader(f,delimiter = ',')
+            for row in reader:
+                matchID = row[0]
+                self.added_matches.add(matchID)
 
         #the columns are initialized like this to prevent needing to write out each column manually
         append = DataSetMaker.columns.append

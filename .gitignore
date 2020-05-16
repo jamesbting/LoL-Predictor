@@ -12,3 +12,7 @@
 **/not_my_datasets
 **/.vscode
 **/src/__pycache__
+datasets/training_data-RogerDesktop.csv
+src/DataPuller-RogerDesktop.py
+src/Driver-RogerDesktop.py
+src/DataSetMaker-RogerDesktop.py

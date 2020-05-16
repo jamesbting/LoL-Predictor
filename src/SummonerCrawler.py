@@ -1,8 +1,8 @@
-from DataPuller import AbstractDataPuller,PlayerDataPuller,MatchDataPuller
+from DataPuller import PlayerDataPuller,MatchDataPuller
 import random
 import time
 
-class SummonerCrawler(AbstractDataPuller):
+class SummonerCrawler():
     #essentially an iterator that will return the next summoner name
     #helper class to DataSetMaker
     exclude_characters = ["í","è",'á','Á','à','À','â','Â','ä','Ä','ã','Ã','å','Å','æ',
@@ -10,7 +10,8 @@ class SummonerCrawler(AbstractDataPuller):
                           'î','Îï','Ï','ñ','Ñ','ó','Ó','ò','Ò','ô','Ô','ö','Ö','õ','Õ',
                           'ø','Ø','œ','Œ','ß','ú','Ú','ù','Ù','û','Û','ü','Ü']
     def __init__(self,api_key,region,starting_matchID,iterations = 10000,rate_limit = 100, num_calls = 8,rate_limit_per_second = 20):
-        super().__init__(api_key,region)
+        self.api_key = api_key
+        self.region = region
         self.current_matchID = starting_matchID
         self.max_iterations = iterations
         self.num_iterations = 0
@@ -19,6 +20,7 @@ class SummonerCrawler(AbstractDataPuller):
         self.rate_limit = rate_limit
         self.num_calls = num_calls
         self.rate_limit_per_second = rate_limit_per_second
+        
     #check if there should be a next element (this will essentially limit how many match data points we will have)
     def hasNext(self):
         return self.num_iterations < self.max_iterations
