@@ -1,5 +1,8 @@
 from DataSetMaker import DataSetMaker
 import csv
+import cProfile
+import pstats
+import io
 
 def main():
     region = 'na1'
@@ -7,7 +10,7 @@ def main():
     f = open(api_key_location,"r")
     api_key = f.readline()
     f.close()
-    ON_DESKTOP = False
+    ON_DESKTOP = True
     
     if(ON_DESKTOP):
         training_data_location = "C:\\Users\\UserD\\OneDrive - McGill University\\Personal\\Personal Projects\\LoL-Predictor\\datasets\\training_data.csv"
@@ -23,10 +26,14 @@ def main():
 
     starting_matchID = mylist[0] #Seed matchID
     
-    num_data_points = 150
+    num_data_points = 3
 
+    pr = cProfile.Profile()
+    pr.enable()
     data_set_maker = DataSetMaker(api_key_location,region,training_data_location,starting_matchID,num_data_points=num_data_points)
     data_set_maker.makeTrainingData()
+    pr.disable()
+    pr.dump_stats("../cProfile-Results.txt")
 
 if __name__ == "__main__":
     main()

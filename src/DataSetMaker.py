@@ -47,25 +47,26 @@ class DataSetMaker:
                 self.added_matches.add(row[0])
 
         #the columns are initialized like this to prevent needing to write out each column manually
+        append = DataSetMaker.columns.append
         for team in DataSetMaker.teams:
             for team_stat in DataSetMaker.team_stats:
-                DataSetMaker.columns.append(team + team_stat)
+               append("%s%s" % (team,team_stat))
 
         for summoner in DataSetMaker.summoners:
             for information in DataSetMaker.summoner_information:
-                DataSetMaker.columns.append(summoner + information)
+                append("%s%s" % (summoner,information))
 
             for timeline_information in DataSetMaker.summoner_timeline:
-                DataSetMaker.columns.append(summoner + timeline_information)
+                append("%s%s" % (summoner,timeline_information))
 
             for summoner_mastery_information in DataSetMaker.summoner_mastery:
-                DataSetMaker.columns.append(summoner+ summoner_mastery_information)
+                append("%s%s" % (summoner,summoner_mastery_information))
 
             for information in DataSetMaker.participant_information:
-                DataSetMaker.columns.append(summoner + information)
+                append("%s%s" % (summoner,information))
 
             for stat in DataSetMaker.participant_stats:
-                DataSetMaker.columns.append(summoner + stat)
+                append("%s%s" % (summoner,stat))
             
         DataSetMaker.columns.append('b_win')
         DataSetMaker.columns.append('r_win')   
@@ -78,16 +79,22 @@ class DataSetMaker:
         crawler = SummonerCrawler(self.api_key,self.region,self.starting_matchID,self.num_data_points)
         matchID = self.starting_matchID
         pbar = tqdm(total = self.num_data_points)
-        while(crawler.hasNext()):
+
+        #local variables to speed up processing, and void using the "." operator
+        writeMatch = self.writeMatchToFile
+        hasNext = crawler.hasNext
+        nextID = crawler.next
+
+        while(hasNext()):
             if(matchID not in self.added_matches):
                 try:
-                    self.writeMatchToFile(matchID,match_puller,self.training_data_location)
+                    writeMatch(matchID,match_puller,self.training_data_location)
                 except:
                     #something went wrong, just skip this match
-                    matchID = crawler.next(worked = False)
+                    matchID = nextID(worked = False)
                     continue
 
-            matchID = crawler.next()
+            matchID = nextID()
             pbar.update(1)
         
         #done looping
@@ -129,14 +136,15 @@ class DataSetMaker:
     def __getTeamStats(self,match_data):
         team_stats = []
         first_tower = [False,False]
+        append = team_stats.append
         for teamIndex in [0,1]:
             for team_stat in DataSetMaker.team_stats:
                 if(team_stat == "firstTower"):
                     new_stat = match_data['teams'][teamIndex][team_stat]
-                    team_stats.append(new_stat)
+                    append(new_stat)
                     first_tower[teamIndex] = new_stat
                 else:
-                    team_stats.append(match_data['teams'][teamIndex][team_stat])
+                   append(match_data['teams'][teamIndex][team_stat])
 
         self.firstTower = first_tower[0] or first_tower[1]
         return team_stats
@@ -147,14 +155,16 @@ class DataSetMaker:
         player_puller = PlayerDataPuller(self.api_key,self.region)
         champion_mastery_puller = ChampionMasteryDataPuller(self.api_key,self.region)
 
+        extend = summonerInformation.extend
+        getParticipantInformation = self.__getParticipantInformation
+        getParticipantStats = self.__getParticipantStats
         for participantIdentitiesIndex in range(0,10):
             #get summoner information
             
-            summonerInformation.extend(self.__getParticipantInformation(match_data,
-            participantIdentitiesIndex,player_puller,champion_mastery_puller))
+            extend(getParticipantInformation(match_data,participantIdentitiesIndex,player_puller,champion_mastery_puller))
 
             #get summoner stats
-            summonerInformation.extend(self.__getParticipantStats(match_data,participantIdentitiesIndex))
+            extend(getParticipantStats(match_data,participantIdentitiesIndex))
             
         return summonerInformation
 
@@ -196,12 +206,13 @@ class DataSetMaker:
 
         #get mastery information and add to list
         champion_mastery_information = champion_mastery_puller.getChampionMastery(summonerId,championId)
+        append = participant_mastery_information.append
         for mastery_information in DataSetMaker.summoner_mastery[:-1]:
-                participant_mastery_information.append(champion_mastery_information[mastery_information])
+               append(champion_mastery_information[mastery_information])
         
         #add total mastery information to list
         total_mastery = champion_mastery_puller.getTotalChampionMastery(summonerId)
-        participant_mastery_information.append(total_mastery)
+        append(total_mastery)
         
         return participant_mastery_information
     
@@ -209,15 +220,16 @@ class DataSetMaker:
     #check the first tower adding to stat list problem
     def __getParticipantStats(self,match_data,index):
         participantStats = []
+        append = participantStats.append
         for stat in DataSetMaker.participant_stats:
             if(stat == 'firstTowerKill' or stat == 'firstTowerAssist'):
                 if self.firstTower:
-                    participantStats.append(match_data["participants"][index]["stats"][stat])
+                    append(match_data["participants"][index]["stats"][stat])
                 else:
                     #no one got first tower, so add false for firstTower kill and assist to all participants
-                    participantStats.append("False")
+                    append("False")
             else:
-                 participantStats.append(match_data["participants"][index]["stats"][stat])
+                append(match_data["participants"][index]["stats"][stat])
 
         return participantStats
 
