@@ -3,6 +3,7 @@ import csv
 from SummonerCrawler import SummonerCrawler
 from tqdm import tqdm
 import time
+from requests.exceptions import HTTPError
 class DataSetMaker:
     #match id, then team stats then individual summoner stats(blue team, then red team), lastly which team won
     columns = ['gameId']
@@ -29,15 +30,13 @@ class DataSetMaker:
 
    
    
-    def __init__(self,api_key_location,region,training_data_location,starting_matchID,num_data_points = 10000):
+    def __init__(self,api_key_location,region,training_data_location,iterator: SummonerCrawler):
         self.api_key_location = api_key_location
         f = open(self.api_key_location)
         self.api_key = f.readline()
         f.close()
         self.region = 'na1'
         self.training_data_location = training_data_location
-        self.starting_matchID = starting_matchID
-        self.num_data_points = num_data_points
         #add all the match Id's to the set that are in the training data file already
         self.added_matches = set()
         
@@ -74,41 +73,52 @@ class DataSetMaker:
         self.firstTower = False #since the riot API skips the firstTowerKill and firstTowerAssist for participant stats if no tower is destroyed
         
     #function that will make all the rows of the training data
-    def makeTrainingData(self):
-        match_puller = MatchDataPuller(self.api_key,self.region)
-        crawler = SummonerCrawler(self.api_key,self.region,self.starting_matchID,self.num_data_points)
-       
-        pbar = tqdm(total = self.num_data_points)
+    def makeTrainingData(self,numIterations,startingID):
+        match_puller = MatchDataPuller(self.api_key,self.region)       
+        crawler = SummonerCrawler(self.api_key,self.region,startingID,numIterations)
+        pbar = tqdm(total = numIterations)
+
 
         #local variables to speed up processing, and void using the "." operator
-        writeMatch = self.writeMatchToFile
+        #writeMatch = self.writeMatchToFile
+        writeMatch = self.__newMatchLine
         hasNext = crawler.hasNext
         nextID = crawler.next
 
-        matchID = nextID()
-        while(hasNext()):
-            if(matchID not in self.added_matches):
-                try:
-                    writeMatch(matchID,match_puller,self.training_data_location)
-                except:
-                    #something went wrong, just skip this match
-                    matchID = nextID(worked = False)
-                    continue
-
-            matchID = nextID()
-            pbar.update(1)
+        matchID = startingID
+        with open(self.training_data_location,'a',newline = '\n') as f:
+            while(hasNext()):
+                if(matchID not in self.added_matches):
+                    try:
+                        newLine = writeMatch(matchID,match_puller)
+                    #except HTTPError as e:
+                        #time.sleep(60)
+                        #continue
+                    except:
+                        #something went wrong, just skip this match
+                        matchID = nextID(worked = False)
+                        continue
+                    else:
+                        writer = csv.writer(f)
+                        writer.writerow(newLine)
+                        self.added_matches.add(newLine[0])
+                        matchID = nextID()
+                        pbar.update(1)
+                else:
+                    matchID = nextID(False)
         
         #done looping
         pbar.close()
+        f.close()
+        return matchID
         
     #function that will write a single match to a file
-    def writeMatchToFile(self,matchID,match_puller,filename):
-        newLine = self.__newMatchLine(matchID,match_puller)
-        with open(filename,'a',newline = '\n') as f:
-                writer = csv.writer(f)
-                writer.writerow(newLine)
-        f.close()
-        self.added_matches.add(newLine[0])
+    #def writeMatchToFile(self,matchID,match_puller,filename):
+        
+        
+               
+    #    f.close()
+        
 
         
 
@@ -238,6 +248,9 @@ class DataSetMaker:
             append(match_data["participants"][index]["stats"][stat])
 
         return participantStats
+
+    def setNewStartingID(self,newID):
+        self.starting_matchID = newID
 
 
 
