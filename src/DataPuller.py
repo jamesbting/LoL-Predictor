@@ -20,13 +20,9 @@ class AbstractDataPuller:
             print("We should retry in {seconds} seconds".format(seconds = err.headers['Retry-After']))
             print("This retry-after is handled by default by the RiotWatcher library")
             print("Future requests must wait until the retry-after time has passed")
-            time.sleep(30)
         elif err.response.status_code == 404:
             print("No such information could not be found")
-        elif err.response.status_code == 504:
-            time.sleep(30)
-        elif err.response.status_code == 503:
-            time.sleep(30)
+            
 
 class PlayerDataPuller(AbstractDataPuller):
     #concrete subclass of abstract data puller,
@@ -61,7 +57,6 @@ class PlayerDataPuller(AbstractDataPuller):
 
     def ApiErrorMessage(self,err):
         super().ApiErrorMessage(err)
-        print("This error was raised by ",type(self).__name__)
 
 
 class MatchDataPuller(AbstractDataPuller):
@@ -82,7 +77,6 @@ class MatchDataPuller(AbstractDataPuller):
 
     def ApiErrorMessage(self,err):
         super().ApiErrorMessage(err)
-        print("This error was raised by ",type(self).__name__)
 
 class ChampionMasteryDataPuller(AbstractDataPuller):
     def __init__(self,api_key,region):
@@ -102,6 +96,4 @@ class ChampionMasteryDataPuller(AbstractDataPuller):
 
     def ApiErrorMessage(self,err):
         super().ApiErrorMessage(err)
-        print("This error was raised by ",type(self).__name__)
-
     
