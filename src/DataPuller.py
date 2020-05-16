@@ -17,11 +17,11 @@ class AbstractDataPuller:
         self.region = new_region
     def ApiErrorMessage(self,err):
         if err.response.status_code == 429:
-            print("We should retry in {seconds} seconds".format(seconds = err.headers['Retry-After']))
-            print("This retry-after is handled by default by the RiotWatcher library")
-            print("Future requests must wait until the retry-after time has passed")
+            print("\nWe should retry in {seconds} seconds".format(seconds = err.headers['Retry-After']))
+            print("\nThis retry-after is handled by default by the RiotWatcher library")
+            print("\nFuture requests must wait until the retry-after time has passed")
         elif err.response.status_code == 404:
-            print("No such information could not be found")
+            print("\nNo such information could not be found")
             
 
 class PlayerDataPuller(AbstractDataPuller):

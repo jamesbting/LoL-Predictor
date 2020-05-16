@@ -68,8 +68,8 @@ class DataSetMaker:
             for stat in DataSetMaker.participant_stats:
                 append("%s%s" % (summoner,stat))
             
-        DataSetMaker.columns.append('b_win')
-        DataSetMaker.columns.append('r_win')   
+        append('b_win')
+        append('r_win')   
 
         self.firstTower = False #since the riot API skips the firstTowerKill and firstTowerAssist for participant stats if no tower is destroyed
         
@@ -77,7 +77,7 @@ class DataSetMaker:
     def makeTrainingData(self):
         match_puller = MatchDataPuller(self.api_key,self.region)
         crawler = SummonerCrawler(self.api_key,self.region,self.starting_matchID,self.num_data_points)
-        matchID = self.starting_matchID
+       
         pbar = tqdm(total = self.num_data_points)
 
         #local variables to speed up processing, and void using the "." operator
@@ -85,6 +85,7 @@ class DataSetMaker:
         hasNext = crawler.hasNext
         nextID = crawler.next
 
+        matchID = nextID()
         while(hasNext()):
             if(matchID not in self.added_matches):
                 try:
@@ -113,8 +114,6 @@ class DataSetMaker:
 
     def __newMatchLine(self,matchID,match_puller):
         match_data = match_puller.getMatchInfoByMatchID(matchID)
-        #if match_data['gameMode'] !="CLASSIC" or match_data['mapId'] != 11: #only get classic game mode from Summoner's Rift
-            #return
 
         new_line = []
         new_line.append(match_data['gameId'])
@@ -221,15 +220,22 @@ class DataSetMaker:
     def __getParticipantStats(self,match_data,index):
         participantStats = []
         append = participantStats.append
-        for stat in DataSetMaker.participant_stats:
-            if(stat == 'firstTowerKill' or stat == 'firstTowerAssist'):
-                if self.firstTower:
-                    append(match_data["participants"][index]["stats"][stat])
-                else:
-                    #no one got first tower, so add false for firstTower kill and assist to all participants
-                    append("False")
-            else:
-                append(match_data["participants"][index]["stats"][stat])
+        firstTowerKillIndex = DataSetMaker.participant_stats.index('firstTowerKill')
+        firstTowerAssistIndex = DataSetMaker.participant_stats.index('firstTowerAssist')
+        for stat in DataSetMaker.participant_stats[:firstTowerKillIndex]:
+            append(match_data["participants"][index]["stats"][stat])
+        
+       
+        if self.firstTower:
+            append(match_data["participants"][index]["stats"]['firstTowerKill'])
+            append(match_data["participants"][index]["stats"]['firstTowerAssist'])
+        else:
+            #no one got first tower, so add false for firstTower kill and assist to all participants
+            append("False")
+            append("False")
+    
+        for stat in DataSetMaker.participant_stats[firstTowerAssistIndex+1:]:
+            append(match_data["participants"][index]["stats"][stat])
 
         return participantStats
 

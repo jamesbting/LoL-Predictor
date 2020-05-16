@@ -27,8 +27,8 @@ class SummonerCrawler(AbstractDataPuller):
         assert self.hasNext()
         
         #make sure we dont exceed the limit
-        if(self.num_iterations != 0 and (self.num_calls * self.num_iterations) % 100 == 0):
-            time.sleep(120)
+        #if(self.num_iterations != 0 and (self.num_calls * self.num_iterations) % self.rate_limit == 0):
+           # time.sleep(60)
 
         match_data_list = self.getMatchList()
         all_matches_list = match_data_list["matches"]
