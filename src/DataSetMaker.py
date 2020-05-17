@@ -93,9 +93,9 @@ class DataSetMaker:
                 if(matchID not in self.added_matches):
                     try:
                         newLine = writeMatch(matchID,match_puller)
-                    #except HTTPError as e:
-                        #time.sleep(60)
-                        #continue
+                    except HTTPError as e:
+                        time.sleep(60)
+                        continue
                     except:
                         #something went wrong, just skip this match
                         matchID = nextID(worked = False)
@@ -113,16 +113,6 @@ class DataSetMaker:
         pbar.close()
         f.close()
         return matchID
-        
-    #function that will write a single match to a file
-    #def writeMatchToFile(self,matchID,match_puller,filename):
-        
-        
-               
-    #    f.close()
-        
-
-        
 
     def __newMatchLine(self,matchID,match_puller):
         match_data = match_puller.getMatchInfoByMatchID(matchID)
