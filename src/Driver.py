@@ -1,10 +1,11 @@
 from DataSetMaker import DataSetMaker
 from SummonerCrawler import SummonerCrawler
 from ValidateDataSet import DataSetValidator
+from DataPuller import MatchDataPuller
 import csv
 import io
 import time
-
+import random
 
    
 
@@ -18,14 +19,16 @@ def makeData(training_data_location,writeToColumns = False):
     
 
     num_data_points = 3
-    num_data_batches = 50
-    mylist = []
+    num_data_batches = 20
+
+    matchID_list = set()
     with open(training_data_location,"r") as f:
-        for row in reversed(list(csv.reader(f))):
-            mylist = row
-            break
-    starting_matchID = mylist[0]
-    match_iterator = SummonerCrawler(api_key,region,starting_matchID,iterations=num_data_batches*num_data_batches)
+        for row in csv.reader(f):
+            matchID_list.add(row[0])
+
+    starting_matchID = random.sample(matchID_list,1)[0]
+
+    match_iterator = SummonerCrawler(api_key,region,starting_matchID,max_iterations=num_data_batches*num_data_batches)
     data_set_maker = DataSetMaker(api_key_location,region,training_data_location,match_iterator)
 
     if(writeToColumns):
@@ -36,9 +39,14 @@ def makeData(training_data_location,writeToColumns = False):
     makeData = data_set_maker.makeTrainingData
    
     for batch in range(num_data_batches):
-        starting_matchID = makeData(num_data_points,starting_matchID)
-        sleep(60)
-            
+        try:
+            starting_matchID = makeData(num_data_points,starting_matchID)
+            matchID_list.add(starting_matchID)
+            sleep(60)
+        except:
+            starting_matchID = random.sample(matchID_list,1)[0]
+            sleep(60)
+
 def validateData(training_data_location):
     validator = DataSetValidator(training_data_location)
     validator.validateDataSet()
@@ -52,7 +60,12 @@ def main():
     ON_DESKTOP = False
     VALIDATE_DATA = False
     WRITE_TO_COLUMNS = False
-    
+
+    api_key_location = "api_key.txt"
+    f = open(api_key_location,"r")
+    api_key = f.readline()
+    f.close()
+
     if(ON_DESKTOP):
         training_data_location = "C:\\Users\\UserD\\OneDrive - McGill University\\Personal\\Personal Projects\\LoL-Predictor\\datasets\\training_data.csv"
     else:

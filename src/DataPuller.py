@@ -1,5 +1,4 @@
 from riotwatcher import LolWatcher,ApiError
-import time
 
 class AbstractDataPuller:
     #abstract data puller class
@@ -15,13 +14,6 @@ class AbstractDataPuller:
 
     def set_region(self,new_region):
         self.region = new_region
-    def ApiErrorMessage(self,err):
-        if err.response.status_code == 429:
-            print("\nWe should retry in {seconds} seconds".format(seconds = err.headers['Retry-After']))
-            print("\nThis retry-after is handled by default by the RiotWatcher library")
-            print("\nFuture requests must wait until the retry-after time has passed")
-        elif err.response.status_code == 404:
-            print("\nNo such information could not be found")
             
 
 class PlayerDataPuller(AbstractDataPuller):
@@ -31,32 +23,23 @@ class PlayerDataPuller(AbstractDataPuller):
         super().__init__(api_key,region)
         
     def getPlayerInfoByAccountID(self,accountID):
-        try:
-            return self.lol_watcher.summoner.by_account(self.region,accountID)
-        except ApiError as err:
-           self.ApiErrorMessage(err)
+        return self.lol_watcher.summoner.by_account(self.region,accountID)
+        
+           
 
     def getPlayerInfoBySummonerID(self,summonerID):
-        try:
-            return self.lol_watcher.summoner.by_account(self.region,summonerID)
-        except ApiError as err:
-           self.ApiErrorMessage(err)
+        return self.lol_watcher.summoner.by_account(self.region,summonerID)
+        
+           
 
     def getPlayerInfoBySummonerName(self,summonerName):
-        try:
-            return self.lol_watcher.summoner.by_name(self.region,summonerName)
-        except ApiError as err:
-           self.ApiErrorMessage(err)
+        return self.lol_watcher.summoner.by_name(self.region,summonerName)
+        
+           
 
     def getPlayerInfoByPlayerID(self,playerID):
-        try:
-            return self.lol_watcher.summoner.by_puuid(self.region,playerID)
-            self.lol_watcher.summoner.by_id
-        except ApiError as err:
-           self.ApiErrorMessage(err)
-
-    def ApiErrorMessage(self,err):
-        super().ApiErrorMessage(err)
+        return self.lol_watcher.summoner.by_puuid(self.region,playerID)
+    
 
 
 class MatchDataPuller(AbstractDataPuller):
@@ -64,36 +47,23 @@ class MatchDataPuller(AbstractDataPuller):
     def __init__(self,api_key,region):
         super().__init__(api_key,region)
     def getMatchInfoByMatchID(self,matchID):
-        try:
-            return self.lol_watcher.match.by_id(self.region,matchID)
-        except ApiError as err:
-           self.ApiErrorMessage(err)
+        return self.lol_watcher.match.by_id(self.region,matchID)
+        
+           
     
     def getMatchListByAccountID(self,accountID,queue = None,season = None):
-        try:
-            return self.lol_watcher.match.matchlist_by_account(self.region,accountID,queue,season)
-        except ApiError as err:
-           self.ApiErrorMessage(err)
+        return self.lol_watcher.match.matchlist_by_account(self.region,accountID,queue,season)
 
-    def ApiErrorMessage(self,err):
-        super().ApiErrorMessage(err)
 
 class ChampionMasteryDataPuller(AbstractDataPuller):
     def __init__(self,api_key,region):
         super().__init__(api_key,region)
 
     def getChampionMastery(self,summonerID,championID):
-        try:
-            return self.lol_watcher.champion_mastery.by_summoner_by_champion(self.region,summonerID,championID)
-        except ApiError as err:
-           self.ApiErrorMessage(err)
+        return self.lol_watcher.champion_mastery.by_summoner_by_champion(self.region,summonerID,championID)
+        
+           
     
     def getTotalChampionMastery(self,summonerID):
-        try:
-            return self.lol_watcher.champion_mastery.scores_by_summoner(self.region,summonerID)
-        except ApiError as err:
-           self.ApiErrorMessage(err)
-
-    def ApiErrorMessage(self,err):
-        super().ApiErrorMessage(err)
+        return self.lol_watcher.champion_mastery.scores_by_summoner(self.region,summonerID)
     

@@ -2,7 +2,6 @@ from DataPuller import PlayerDataPuller, MatchDataPuller,ChampionMasteryDataPull
 import csv
 from SummonerCrawler import SummonerCrawler
 from tqdm import tqdm
-import time
 from requests.exceptions import HTTPError
 class DataSetMaker:
     #match id, then team stats then individual summoner stats(blue team, then red team), lastly which team won
@@ -89,23 +88,16 @@ class DataSetMaker:
 
         matchID = startingID
         with open(self.training_data_location,'a',newline = '\n') as f:
+            writer = csv.writer(f)
+            write_row = writer.writerow
+            add_to_set = self.added_matches.add
             while(hasNext()):
                 if(matchID not in self.added_matches):
-                    try:
-                        newLine = writeMatch(matchID,match_puller)
-                    except HTTPError as e:
-                        time.sleep(60)
-                        continue
-                    except:
-                        #something went wrong, just skip this match
-                        matchID = nextID(worked = False)
-                        continue
-                    else:
-                        writer = csv.writer(f)
-                        writer.writerow(newLine)
-                        self.added_matches.add(newLine[0])
-                        matchID = nextID()
-                        pbar.update(1)
+                    newLine = writeMatch(matchID,match_puller)
+                    write_row(newLine)
+                    add_to_set(newLine[0])
+                    matchID = nextID()
+                    pbar.update(1)
                 else:
                     matchID = nextID(False)
         
