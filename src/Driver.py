@@ -58,7 +58,7 @@ def writeColumns():
 
 def main():
     ON_DESKTOP = False
-    VALIDATE_DATA = False
+    VALIDATE_DATA = True
     WRITE_TO_COLUMNS = False
 
     api_key_location = "api_key.txt"
@@ -75,6 +75,8 @@ def main():
         validateData(training_data_location)
     else:
         makeData(training_data_location,WRITE_TO_COLUMNS)
+        validateData(training_data_location)
+        
 
 
 if __name__ == "__main__":
