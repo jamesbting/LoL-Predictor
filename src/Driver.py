@@ -58,7 +58,7 @@ def writeColumns():
 
 def main():
     ON_DESKTOP = False
-    VALIDATE_DATA = True
+    VALIDATE_DATA = False
     WRITE_TO_COLUMNS = False
 
     api_key_location = "api_key.txt"
