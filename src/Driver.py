@@ -19,15 +19,16 @@ def makeData(training_data_location,writeToColumns = False):
     
 
     num_data_points = 3
-    num_data_batches = 20
+    num_data_batches = 10
 
     matchID_list = set()
     with open(training_data_location,"r") as f:
-        for row in csv.reader(f):
+        reader = csv.reader(f)
+        next(reader)
+        for row in reader:
             matchID_list.add(row[0])
-
-    starting_matchID = random.sample(matchID_list,1)[0]
-
+        starting_matchID = row[0]
+    f.close()
     match_iterator = SummonerCrawler(api_key,region,starting_matchID,max_iterations=num_data_batches*num_data_batches)
     data_set_maker = DataSetMaker(api_key_location,region,training_data_location,match_iterator)
 

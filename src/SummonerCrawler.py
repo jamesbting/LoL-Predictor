@@ -43,11 +43,15 @@ class SummonerCrawler():
         getPlayerInfo = self.player_puller.getPlayerInfoBySummonerName
         getMatchListForPlayer = self.getMatchListForParticipant
         for summoner in curr_summoners:
-            curr_player = getPlayerInfo(summoner["player"]["summonerName"])
-            match_data_list = getMatchListForPlayer(curr_player)
-            #if the matchlist is non empty, then return it
-            if(match_data_list is not None):
-                return match_data_list
+            try:
+                curr_player = getPlayerInfo(summoner["player"]["summonerName"])
+            except:
+                continue
+            else:
+                match_data_list = getMatchListForPlayer(curr_player)
+                #if the matchlist is non empty, then return it
+                if(match_data_list is not None):
+                    return match_data_list
 
     def getMatchListForParticipant(self,curr_player):
         match_data = self.match_puller.getMatchListByAccountID(curr_player['accountId'],[420],[13]) #ranked queue only, for the 2019 season
