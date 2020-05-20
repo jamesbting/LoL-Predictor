@@ -19,7 +19,7 @@ def makeData(training_data_location,writeToColumns = False):
     
 
     num_data_points = 3
-    num_data_batches = 100
+    num_data_batches = 500
 
     matchID_list = set()
     with open(training_data_location,"r") as f:
@@ -43,7 +43,7 @@ def makeData(training_data_location,writeToColumns = False):
         try:
             starting_matchID = makeData(num_data_points,starting_matchID)
             matchID_list.add(starting_matchID)
-            sleep(60)
+            sleep(30)
         except:
             starting_matchID = random.sample(matchID_list,1)[0]
             sleep(60)
