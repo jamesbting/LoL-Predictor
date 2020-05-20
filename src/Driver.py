@@ -19,7 +19,7 @@ def makeData(training_data_location,writeToColumns = False):
     
 
     num_data_points = 3
-    num_data_batches = 500
+    num_data_batches = 12
 
     matchID_list = set()
     with open(training_data_location,"r") as f:
@@ -59,7 +59,7 @@ def writeColumns():
 
 def main():
     ON_DESKTOP = False
-    VALIDATE_DATA = True
+    VALIDATE_DATA = False
     WRITE_TO_COLUMNS = False
 
     api_key_location = "api_key.txt"
