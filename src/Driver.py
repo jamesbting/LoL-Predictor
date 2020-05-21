@@ -19,7 +19,7 @@ def makeData(training_data_location,writeToColumns = False):
     
 
     num_data_points = 3
-    num_data_batches = 12
+    num_data_batches = 120
 
     matchID_list = set()
     with open(training_data_location,"r") as f:
