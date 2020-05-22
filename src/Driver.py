@@ -1,5 +1,5 @@
 from DataSetMaker import DataSetMaker
-from SummonerCrawler import SummonerCrawler
+from MatchCrawler import MatchCrawler
 from ValidateDataSet import DataSetValidator
 from DataPuller import MatchDataPuller
 import csv
@@ -30,7 +30,7 @@ def makeData(training_data_location,writeToColumns = False):
             matchID_list.add(row[0])
         starting_matchID = row[0]
     f.close()
-    match_iterator = SummonerCrawler(api_key,region,starting_matchID,max_iterations=num_data_batches*num_data_batches)
+    match_iterator = MatchCrawler(api_key,region,starting_matchID,max_iterations=num_data_batches*num_data_batches)
     data_set_maker = DataSetMaker(api_key_location,region,training_data_location,match_iterator)
     if(writeToColumns):
         writeColumns()

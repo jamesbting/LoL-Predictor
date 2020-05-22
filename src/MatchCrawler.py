@@ -1,7 +1,7 @@
 from DataPuller import PlayerDataPuller,MatchDataPuller
 import random
 
-class SummonerCrawler():
+class MatchCrawler():
     #essentially an iterator that will return the next summoner name
     #helper class to DataSetMaker
     exclude_characters = ["í","è",'á','Á','à','À','â','Â','ä','Ä','ã','Ã','å','Å','æ',

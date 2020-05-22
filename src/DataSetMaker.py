@@ -1,6 +1,6 @@
 from DataPuller import PlayerDataPuller, MatchDataPuller,ChampionMasteryDataPuller
 import csv
-from SummonerCrawler import SummonerCrawler
+from MatchCrawler import MatchCrawler
 from tqdm import tqdm
 from requests.exceptions import HTTPError
 class DataSetMaker:
@@ -29,7 +29,7 @@ class DataSetMaker:
 
    
    
-    def __init__(self,api_key_location,region,training_data_location,iterator: SummonerCrawler):
+    def __init__(self,api_key_location,region,training_data_location,iterator: MatchCrawler):
         self.api_key_location = api_key_location
         f = open(self.api_key_location)
         self.api_key = f.readline()
@@ -76,7 +76,7 @@ class DataSetMaker:
     #function that will make all the rows of the training data
     def makeTrainingData(self,numIterations,startingID):
         match_puller = MatchDataPuller(self.api_key,self.region)       
-        crawler = SummonerCrawler(self.api_key,self.region,startingID,numIterations)
+        crawler = MatchCrawler(self.api_key,self.region,startingID,numIterations)
         pbar = tqdm(total = numIterations)
 
 
