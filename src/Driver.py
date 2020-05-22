@@ -21,6 +21,7 @@ def makeData(training_data_location,writeToColumns = False):
     num_data_points = 3
     num_data_batches = 120
 
+    #get the set of current match ID's
     matchID_list = set()
     with open(training_data_location,"r") as f:
         reader = csv.reader(f)
@@ -39,6 +40,7 @@ def makeData(training_data_location,writeToColumns = False):
     sleep = time.sleep
     makeData = data_set_maker.makeTrainingData
    
+   #collect the data
     for batch in range(num_data_batches):
         try:
             starting_matchID = makeData(num_data_points,starting_matchID)
