@@ -32,7 +32,6 @@ def makeData(training_data_location,writeToColumns = False):
     f.close()
     match_iterator = SummonerCrawler(api_key,region,starting_matchID,max_iterations=num_data_batches*num_data_batches)
     data_set_maker = DataSetMaker(api_key_location,region,training_data_location,match_iterator)
-
     if(writeToColumns):
         writeColumns()
     
