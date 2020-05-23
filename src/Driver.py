@@ -8,7 +8,7 @@ import time
 import random
 
    
-
+#method that makes a data
 def makeData(training_data_location,writeToColumns = False):
     region = 'na1'
     api_key_location = "api_key.txt"
@@ -49,6 +49,7 @@ def makeData(training_data_location,writeToColumns = False):
             starting_matchID = random.sample(matchID_list,1)[0]
             sleep(60)
 
+#method that makes a validate data object and returns the result
 def validateData(training_data_location):
     validator = DataSetValidator(training_data_location)
     validator.validateDataSet()

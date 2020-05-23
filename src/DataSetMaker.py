@@ -36,10 +36,9 @@ class DataSetMaker:
         f.close()
         self.region = 'na1'
         self.training_data_location = training_data_location
+       
         #add all the match Id's to the set that are in the training data file already
         self.added_matches = set()
-        
-
         with open(self.training_data_location,"r") as f:
             reader = csv.reader(f,delimiter = ',')
             for row in reader:
@@ -80,8 +79,7 @@ class DataSetMaker:
         pbar = tqdm(total = numIterations)
 
 
-        #local variables to speed up processing, and void using the "." operator
-        #writeMatch = self.writeMatchToFile
+        #local variables to speed up processing, and avoid using the "." operator
         writeMatch = self.__newMatchLine
         hasNext = crawler.hasNext
         nextID = crawler.next
@@ -92,7 +90,7 @@ class DataSetMaker:
             write_row = writer.writerow
             add_to_set = self.added_matches.add
             while(hasNext()):
-                if(matchID not in self.added_matches):
+                if(matchID not in self.added_matches): #this match is not in the data file, add to the file
                     newLine = writeMatch(matchID,match_puller)
                     write_row(newLine)
                     add_to_set(newLine[0])
@@ -126,6 +124,9 @@ class DataSetMaker:
 
         return new_line
     #method that adds the team stats for both teams to a list, then returns the list
+    #If neither team destorys a turret then the Riot API will not include the firstTower indicator in the 
+    #summoner stats. Therefore, this method will determine if either team had destroyed the tower, and if not, it will
+    # determine if the object should add these in the summoner stats
     def __getTeamStats(self,match_data):
         team_stats = []
         first_tower = [False,False]
