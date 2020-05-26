@@ -44,7 +44,7 @@ def makeData(training_data_location,writeToColumns = False):
         try:
             starting_matchID = makeData(num_data_points,starting_matchID)
             matchID_list.add(starting_matchID)
-            sleep(30)
+            sleep(45)
         except:
             starting_matchID = random.sample(matchID_list,1)[0]
             sleep(60)
