@@ -7,10 +7,12 @@ Do you want to know if you will win a game before you've played? This project ai
 **Set-up**
 
 First, ensure you have Python 3.6.8 or greater installed. Then, ensure you have PyTorch installed by running:
+
 `pip install pytorch`
 
 You can verify that PyTorch has been installed correctly by going to the Terminal/PowerShell, then running the following code:
 `python`
+
 `import torch`
 
 If no errors appear, then PyTorch has successfully been installed.
