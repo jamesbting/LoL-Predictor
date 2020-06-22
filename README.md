@@ -23,6 +23,8 @@ If you wish to scrape data from the Riot Games API, you will need your own API k
 
 Once the library has been installed, clone the repository to your local computer, and open it in your text editor of choice (Note it should be able to open .py and .ipynb files)
 
+The dataset is available here, under "datasets", or it can also be downloaded from Kaggle: https://www.kaggle.com/jamesbting/league-of-legends-ranked-match-data-from-na?rvi=1
+
 **ACKNOWLEDGMENTS**:
 This project is based on the projects done by Kenneth Hall(https://github.com/minihat/LoL-Match-Prediction), and by Thomas Huang, David Kim, and Gregory Leung (http://thomasythuang.github.io/League-Predictor/).
 
